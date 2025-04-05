@@ -48,9 +48,11 @@ EOF
 
 # Import reference data
 echo "Importing reference data..."
-mkdir -p scripts
-cp /app/scripts/init_data.py /app/scripts/
-python3 /app/scripts/init_data.py
+# Suppression de la copie inutile qui cause l'erreur
+if ! python3 /app/scripts/init_data.py; then
+    echo "Warning: Failed to import reference data, but continuing startup"
+    # Ne pas quitter avec une erreur pour permettre à l'application de démarrer quand même
+fi
 
 # Start the application
 echo "Starting gunicorn..."
