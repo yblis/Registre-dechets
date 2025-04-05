@@ -41,24 +41,20 @@ Application de gestion de registre de déchets avec support pour plusieurs types
    docker-compose up -d
    ```
 
-4. Initialiser la base de données:
-   ```bash
-   # Rendre le script d'initialisation exécutable
-   chmod +x init_db.sh
+   L'application va automatiquement:
+   - Attendre que la base de données soit prête
+   - Créer les tables nécessaires
+   - Créer un utilisateur administrateur s'il n'existe pas déjà
    
-   # Exécuter le script d'initialisation dans le conteneur
-   docker-compose exec web ./init_db.sh
+   Vous pouvez suivre l'initialisation avec:
+   ```bash
+   docker-compose logs -f web
    ```
 
-   **IMPORTANT**: Cette étape est cruciale car elle crée les tables dans la base de données PostgreSQL. Sans cela, vous verrez des erreurs comme:
-   ```
-   sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedTable) relation "user" does not exist
-   ```
-
-   Le script d'initialisation:
-   - Attend que la base de données soit prête
-   - Exécute les migrations pour créer les tables
-   - Crée un utilisateur administrateur à partir des variables d'environnement
+   **Note**: Les identifiants de l'administrateur sont définis par les variables d'environnement:
+   - `ADMIN_USERNAME` (par défaut: "admin")
+   - `ADMIN_EMAIL` (par défaut: "admin@example.com")
+   - `ADMIN_PASSWORD` (par défaut: "admin123")
 
 ### Intégration avec Traefik
 

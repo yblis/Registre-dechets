@@ -10,18 +10,36 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - app-data:/app/instance
+      - ./app-data:/app/instance
       - ./init_db.sh:/app/init_db.sh
     networks:
-      - app-network
+      - dechets-network
+      - traefik_traefik
     environment:
       - FLASK_APP=run.py
-      - FLASK_ENV=production
+      - FLASK_DEBUG=0
       - DATABASE_URL=postgresql://postgres:${DB_PASSWORD}@db:5432/waste_registry
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.waste-registry.rule=Host(`${DOMAIN}`)"
-      - "traefik.http.services.waste-registry.loadbalancer.server.port=8000"
+      - 'traefik.enable=true'
+      - 'traefik.docker.network=traefik_traefik'
+      
+      # Middleware pour la redirection HTTP vers HTTPS
+      - 'traefik.http.middlewares.redirection.redirectScheme.scheme=https'
+      - 'traefik.http.middlewares.redirection.redirectScheme.permanent=true'
+      
+      # Configuration du service
+      - 'traefik.http.services.dechets_tls.loadbalancer.server.port=8000'
+
+      # Routeur pour le trafic HTTP (redirigé vers HTTPS)
+      - 'traefik.http.routers.dechets_http.rule=Host(`${DOMAIN}`)'
+      - 'traefik.http.routers.dechets_http.entrypoints=http'
+      - 'traefik.http.routers.dechets_http.middlewares=redirection'
+      
+      # Routeur pour le trafic HTTPS
+      - 'traefik.http.routers.dechets_tls.rule=Host(`${DOMAIN}`)'
+      - 'traefik.http.routers.dechets_tls.entrypoints=https'
+      - 'traefik.http.routers.dechets_tls.tls.certresolver=webssl'
+      - 'traefik.http.routers.dechets_tls.tls=true'
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
@@ -36,9 +54,9 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=${DB_PASSWORD}
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - ./db-data:/var/lib/postgresql/data
     networks:
-      - app-network
+      - dechets-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -50,5 +68,7 @@ volumes:
   db-data:
 
 networks:
-  app-network:
+  dechets-network:
     driver: bridge
+  traefik_traefik:  
+    external: true
