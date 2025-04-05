@@ -1,3 +1,7 @@
-name,siret,address
-Producteur 1,12345678901234,"123 rue des Entreprises, 75001 Paris"
-Producteur 2,98765432109876,"456 avenue de l'Industrie, 69002 Lyon"
+name,siret
+ACME Industries,12345678901234
+Tech Solutions,98765432109876
+Green Energy,45678912304567
+Eco Manufacturing,65432198765432
+Clean Industries,78901234567890
+Smart Recycling,32165498701234

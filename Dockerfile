@@ -30,8 +30,18 @@ USER appuser
 COPY --chown=appuser:appuser requirements.txt .
 RUN pip install --user --no-cache-dir -r requirements.txt
 
-# Copy application code
+# Copy application code and data
 COPY --chown=appuser:appuser . .
+
+# Ensure CSV files and scripts are present
+RUN mkdir -p /app/scripts /app/app/utils/export_templates
+
+# Copy CSV templates and init script
+COPY --chown=appuser:appuser app/utils/export_templates/*.csv /app/app/utils/export_templates/
+COPY --chown=appuser:appuser scripts/init_data.py /app/scripts/
+
+# Ensure all files are executable
+RUN chmod -R +x /app/scripts
 
 # Make entrypoint script executable
 RUN chmod +x docker-entrypoint.sh

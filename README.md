@@ -53,8 +53,24 @@ Application de gestion de registre de déchets avec support pour plusieurs types
       - Username: `${ADMIN_USERNAME:-admin}`
       - Email: `${ADMIN_EMAIL:-admin@example.com}`
       - Password: `${ADMIN_PASSWORD:-admin123}`
+   5. Importe les données de référence:
+      - Types de déchets
+      - Producteurs
+      - Transporteurs
+      - Opérations de traitement (codes R)
+      - Opérations d'élimination (codes D)
       
    Ces valeurs peuvent être configurées dans le fichier `.env`
+
+   Pour personnaliser les données de référence, modifiez les fichiers CSV dans:
+   ```
+   app/utils/export_templates/
+   ├── waste_types.csv          # Types de déchets
+   ├── producers.csv            # Producteurs
+   ├── transporters.csv         # Transporteurs
+   ├── treatment_operations.csv # Opérations de traitement (codes R)
+   └── elimination_operations.csv# Opérations d'élimination (codes D)
+   ```
 
    Une fois l'initialisation terminée, l'application est accessible sur:
    - URL: http://localhost:8000 (ou votre domaine configuré)

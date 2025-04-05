@@ -1,4 +1,7 @@
 code,description,dangerous
-15 01 01,Emballages en papier et carton,false
-15 01 02,Emballages en matières plastiques,false
-15 01 10,Emballages contenant des résidus de substances dangereuses,true
+20 01 21,Tubes fluorescents et autres déchets contenant du mercure,true
+20 01 35,Équipements électriques et électroniques mis au rebut,true
+20 01 01,Papier et carton,false
+20 01 02,Verre,false
+20 01 08,Déchets de cuisine et de cantine biodégradables,false
+20 03 01,Déchets municipaux en mélange,false

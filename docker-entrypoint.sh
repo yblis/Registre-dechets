@@ -46,6 +46,12 @@ else:
     print("Admin user already exists")
 EOF
 
+# Import reference data
+echo "Importing reference data..."
+mkdir -p scripts
+cp /app/scripts/init_data.py /app/scripts/
+python3 /app/scripts/init_data.py
+
 # Start the application
 echo "Starting gunicorn..."
 exec gunicorn --bind 0.0.0.0:8000 --workers 4 wsgi:app

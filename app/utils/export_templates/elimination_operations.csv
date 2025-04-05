@@ -1,4 +1,16 @@
 code,description
-E01,Mise en décharge contrôlée
-E02,Incinération des déchets
-E03,Stockage souterrain sécurisé
+D1,Dépôt sur ou dans le sol
+D2,Traitement en milieu terrestre
+D3,Injection en profondeur
+D4,Lagunage
+D5,Mise en décharge spécialement aménagée
+D6,Rejet dans le milieu aquatique
+D7,Immersion
+D8,Traitement biologique
+D9,Traitement physico-chimique
+D10,Incinération à terre
+D11,Incinération en mer
+D12,Stockage permanent
+D13,Regroupement préalablement à l'une des opérations D1 à D12
+D14,Reconditionnement préalablement à l'une des opérations D1 à D13
+D15,Stockage préalablement à l'une des opérations D1 à D14
