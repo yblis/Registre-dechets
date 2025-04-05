@@ -8,6 +8,7 @@ Flask-WTF==1.1.1
 # Database
 SQLAlchemy==1.4.41
 alembic==1.11.1
+psycopg2-binary==2.9.9
 
 # Forms and Validation
 WTForms==3.0.1

@@ -2,25 +2,42 @@
 set -e
 
 echo "Waiting for database to be ready..."
-for i in {1..30}; do
-    if flask db current > /dev/null 2>&1; then
-        echo "Database is ready"
-        break
-    fi
-    echo "Waiting for database... ($i/30)"
+export PGPASSWORD=${DB_PASSWORD}
+until pg_isready -h db -U postgres; do
+    echo "Waiting for database..."
     sleep 2
 done
+echo "Database is ready!"
 
-# Run migrations if needed
+# Run migrations
 echo "Running database migrations..."
-flask db upgrade
+export FLASK_APP=run.py
+if ! flask db upgrade; then
+    echo "Error: Database migration failed!"
+    exit 1
+fi
 
-# Check if admin user exists
+# Check if admin user exists and create if needed
 echo "Checking admin user..."
 if ! flask shell <<EOF
 from app.models import User
+from app import db
 admin = User.query.filter_by(is_admin=True).first()
-exit(0 if admin else 1)
+if not admin:
+    print("Creating admin user...")
+    admin = User(
+        username="${ADMIN_USERNAME:-admin}",
+        email="${ADMIN_EMAIL:-admin@example.com}",
+        is_admin=True,
+        active=True
+    )
+    admin.set_password("${ADMIN_PASSWORD:-admin123}")
+    db.session.add(admin)
+    db.session.commit()
+    print("Admin user created successfully")
+else:
+    print("Admin user already exists")
+exit(0)
 EOF
 then
     echo "Creating admin user..."
