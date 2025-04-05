@@ -1,0 +1,8 @@
+{% extends "main/base_reference.html" %}
+{% set title = "Producteurs de déchets" %}
+{% set headers = ["Nom", "SIRET", "Adresse"] %}
+{% set fields = ["name", "siret", "address"] %}
+{% set list_endpoint = "main.list_producers" %}
+{% set add_endpoint = "main.add_producer" %}
+{% set edit_endpoint = "main.edit_producer" %}
+{% set delete_endpoint = "main.delete_producer" %}

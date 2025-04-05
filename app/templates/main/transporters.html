@@ -1,0 +1,8 @@
+{% extends "main/base_reference.html" %}
+{% set title = "Transporteurs" %}
+{% set headers = ["Nom", "SIRET", "Adresse", "Immatriculation"] %}
+{% set fields = ["name", "siret", "address", "registration"] %}
+{% set list_endpoint = "main.list_transporters" %}
+{% set add_endpoint = "main.add_transporter" %}
+{% set edit_endpoint = "main.edit_transporter" %}
+{% set delete_endpoint = "main.delete_transporter" %}

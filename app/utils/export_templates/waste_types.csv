@@ -1,0 +1,4 @@
+code,description,dangerous
+15 01 01,Emballages en papier et carton,false
+15 01 02,Emballages en matières plastiques,false
+15 01 10,Emballages contenant des résidus de substances dangereuses,true

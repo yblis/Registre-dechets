@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>{{ title }}</h2>
+            <div class="d-flex gap-2">
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{{ url_for('main.export_reference_data', entity_type=entity_type) }}">
+                            <i class="fas fa-file-csv me-2"></i> CSV
+                        </a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('main.export_reference_data_excel', entity_type=entity_type) }}">
+                            <i class="fas fa-file-excel me-2"></i> Excel
+                        </a></li>
+                    </ul>
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-upload"></i> Import
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{{ url_for('main.get_reference_template', entity_type=entity_type) }}">
+                            <i class="fas fa-download me-2"></i> Télécharger le modèle
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form action="{{ url_for('main.import_reference_data', entity_type=entity_type) }}" method="POST" enctype="multipart/form-data" class="px-3">
+                                {{ import_form.hidden_tag() }}
+                                {{ import_form.file(class="form-control form-control-sm mb-2") }}
+                                <button type="submit" class="btn btn-sm btn-primary w-100">
+                                    <i class="fas fa-upload me-1"></i> Importer
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
+                    <i class="fas fa-plus"></i> Ajouter
+                </button>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        {% for header in headers %}
+                            <th>{{ header }}</th>
+                        {% endfor %}
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items.items %}
+                    <tr>
+                        {% for field in fields %}
+                            <td>
+                                {% if field == 'dangerous' %}
+                                    {% if item[field] %}
+                                        <span class="badge bg-danger">Oui</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Non</span>
+                                    {% endif %}
+                                {% else %}
+                                    {{ item[field] }}
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <button type="button" class="btn btn-warning btn-action"
+                                        data-bs-toggle="modal" data-bs-target="#editModal{{ item.id }}"
+                                        title="Modifier">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button" class="btn btn-danger btn-action"
+                                        data-bs-toggle="modal" data-bs-target="#deleteModal{{ item.id }}"
+                                        title="Supprimer">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+
+                            <!-- Modal de modification -->
+                            <div class="modal fade" id="editModal{{ item.id }}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Modifier</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <form method="POST" action="{{ url_for(edit_endpoint, id=item.id) }}">
+                                            <div class="modal-body">
+                                                {{ form.hidden_tag() }}
+                                                {% for field in form if field.name != 'submit' and field.name != 'csrf_token' %}
+                                                <div class="mb-3">
+                                                    {{ field.label(class="form-label") }}
+                                                    {% if field.type == 'BooleanField' %}
+                                                        {{ field(class="form-check-input") }}
+                                                    {% elif field.type == 'TextAreaField' %}
+                                                        {{ field(class="form-control" + (" is-invalid" if field.errors else ""), rows=3, value=item[field.name]) }}
+                                                    {% else %}
+                                                        {{ field(class="form-control" + (" is-invalid" if field.errors else ""), value=item[field.name]) }}
+                                                    {% endif %}
+                                                    {% for error in field.errors %}
+                                                        <div class="invalid-feedback">{{ error }}</div>
+                                                    {% endfor %}
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                                {{ form.submit(class="btn btn-primary") }}
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Modal de confirmation de suppression -->
+                            <div class="modal fade" id="deleteModal{{ item.id }}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Confirmer la suppression</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Êtes-vous sûr de vouloir supprimer cet élément ?</p>
+                                            <p>Cette action est irréversible.</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                            <form action="{{ url_for(delete_endpoint, id=item.id) }}" method="POST">
+                                                {{ form.csrf_token }}
+                                                <button type="submit" class="btn btn-danger">Supprimer</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="{{ headers|length + 1 }}" class="text-center">Aucun élément trouvé</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if items.pages > 1 %}
+        <nav aria-label="Navigation des pages">
+            <ul class="pagination justify-content-center">
+                {% for page in items.iter_pages() %}
+                    {% if page %}
+                        <li class="page-item {{ 'active' if page == items.page else '' }}">
+                            <a class="page-link" href="{{ url_for(list_endpoint, page=page) }}">{{ page }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal d'ajout -->
+<div class="modal fade" id="addModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Ajouter</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for(add_endpoint) }}">
+                <div class="modal-body">
+                    {{ form.hidden_tag() }}
+                    {% for field in form if field.name != 'submit' and field.name != 'csrf_token' %}
+                    <div class="mb-3">
+                        {{ field.label(class="form-label") }}
+                        {% if field.type == 'BooleanField' %}
+                            {{ field(class="form-check-input") }}
+                        {% elif field.type == 'TextAreaField' %}
+                            {{ field(class="form-control" + (" is-invalid" if field.errors else ""), rows=3) }}
+                        {% else %}
+                            {{ field(class="form-control" + (" is-invalid" if field.errors else "")) }}
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    {{ form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

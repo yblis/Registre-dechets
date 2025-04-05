@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="fw-bold" style="background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                Journal d'activité
+            </h1>
+        </div>
+
+        <!-- Filtres -->
+        <div class="search-form card mb-4">
+            <div class="card-body">
+                <form method="GET" action="{{ url_for('main.activity_logs') }}" class="row g-3">
+                    <div class="col-md-4">
+                        <label for="action" class="form-label">Action</label>
+                        <select name="action" id="action" class="form-select">
+                            <option value="">Toutes les actions</option>
+                            {% for action_type in actions %}
+                                <option value="{{ action_type }}" {% if request.args.get('action') == action_type %}selected{% endif %}>
+                                    {% if action_type == 'create' %}Création
+                                    {% elif action_type == 'update' %}Modification
+                                    {% elif action_type == 'delete' %}Suppression
+                                    {% else %}{{ action_type }}
+                                    {% endif %}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="entity_type" class="form-label">Type d'entité</label>
+                        <select name="entity_type" id="entity_type" class="form-select">
+                            <option value="">Tous les types</option>
+                            {% for entity in entity_types %}
+                                <option value="{{ entity }}" {% if request.args.get('entity_type') == entity %}selected{% endif %}>
+                                    {% if entity == 'WasteRecord' %}Enregistrement de déchet
+                                    {% elif entity == 'WasteType' %}Type de déchet
+                                    {% elif entity == 'Producer' %}Producteur
+                                    {% elif entity == 'Transporter' %}Transporteur
+                                    {% elif entity == 'TreatmentOperation' %}Opération de traitement
+                                    {% elif entity == 'EliminationOperation' %}Opération d'élimination
+                                    {% else %}{{ entity }}
+                                    {% endif %}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="user_id" class="form-label">Utilisateur</label>
+                        <select name="user_id" id="user_id" class="form-select">
+                            <option value="">Tous les utilisateurs</option>
+                            {% for user in users %}
+                                <option value="{{ user.id }}" {% if request.args.get('user_id')|int == user.id %}selected{% endif %}>
+                                    {{ user.username }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-filter"></i> Filtrer
+                            </button>
+                            {% if request.args %}
+                            <a href="{{ url_for('main.activity_logs') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Réinitialiser
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tableau des logs -->
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Date et heure</th>
+                                <th>Utilisateur</th>
+                                <th>Action</th>
+                                <th>Type d'entité</th>
+                                <th>ID</th>
+                                <th>Détails</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in logs.items %}
+                            <tr>
+                                <td>{{ log.timestamp.strftime('%d/%m/%Y %H:%M:%S') }}</td>
+                                <td>{{ log.user.username }}</td>
+                                <td>
+                                    {% if log.action == 'create' %}
+                                        <span class="badge bg-success">Création</span>
+                                    {% elif log.action == 'update' %}
+                                        <span class="badge bg-primary">Modification</span>
+                                    {% elif log.action == 'delete' %}
+                                        <span class="badge bg-danger">Suppression</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ log.action }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if log.entity_type == 'WasteRecord' %}
+                                        Enregistrement de déchet
+                                    {% elif log.entity_type == 'WasteType' %}
+                                        Type de déchet
+                                    {% elif log.entity_type == 'Producer' %}
+                                        Producteur
+                                    {% elif log.entity_type == 'Transporter' %}
+                                        Transporteur
+                                    {% elif log.entity_type == 'TreatmentOperation' %}
+                                        Opération de traitement
+                                    {% elif log.entity_type == 'EliminationOperation' %}
+                                        Opération d'élimination
+                                    {% else %}
+                                        {{ log.entity_type }}
+                                    {% endif %}
+                                </td>
+                                <td>{{ log.entity_id }}</td>
+                                <td>
+                                    {% if log.details %}
+                                        <a href="{{ url_for('main.activity_log_details', id=log.id) }}" class="btn btn-sm btn-outline-info">
+                                            <i class="fas fa-info-circle"></i> Détails
+                                        </a>
+                                    {% else %}
+                                        <span class="text-muted">Aucun détail</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="fas fa-history fa-3x mb-3"></i>
+                                        <h5>Aucune activité trouvée</h5>
+                                        <p class="mb-0">Aucune activité ne correspond aux critères de recherche</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                {% if logs.pages > 1 %}
+                <nav aria-label="Navigation des pages" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item {{ 'disabled' if not logs.has_prev }}">
+                            <a class="page-link" href="{{ url_for('main.activity_logs', page=logs.prev_num, **request.args) if logs.has_prev else '#' }}">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
+                        {% for page in logs.iter_pages() %}
+                            {% if page %}
+                                <li class="page-item {{ 'active' if page == logs.page }}">
+                                    <a class="page-link" href="{{ url_for('main.activity_logs', page=page, **request.args) }}">{{ page }}</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        <li class="page-item {{ 'disabled' if not logs.has_next }}">
+                            <a class="page-link" href="{{ url_for('main.activity_logs', page=logs.next_num, **request.args) if logs.has_next else '#' }}">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

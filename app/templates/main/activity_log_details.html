@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="fw-bold" style="background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                Détails de l'activité
+            </h1>
+            <a href="{{ url_for('main.activity_logs') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Retour
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5 class="text-muted mb-3">Informations générales</h5>
+                        <table class="table table-sm">
+                            <tbody>
+                                <tr>
+                                    <th style="width: 40%">Date et heure</th>
+                                    <td style="width: 60%">{{ log.timestamp.strftime('%d/%m/%Y %H:%M:%S') }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Utilisateur</th>
+                                    <td>{{ log.user.username }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Action</th>
+                                    <td>
+                                        {% if log.action == 'create' %}
+                                            <span class="badge bg-success">Création</span>
+                                        {% elif log.action == 'update' %}
+                                            <span class="badge bg-primary">Modification</span>
+                                        {% elif log.action == 'delete' %}
+                                            <span class="badge bg-danger">Suppression</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ log.action }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Type d'entité</th>
+                                    <td>
+                                        {% if log.entity_type == 'WasteRecord' %}
+                                            Enregistrement de déchet
+                                        {% elif log.entity_type == 'WasteType' %}
+                                            Type de déchet
+                                        {% elif log.entity_type == 'Producer' %}
+                                            Producteur
+                                        {% elif log.entity_type == 'Transporter' %}
+                                            Transporteur
+                                        {% elif log.entity_type == 'TreatmentOperation' %}
+                                            Opération de traitement
+                                        {% elif log.entity_type == 'EliminationOperation' %}
+                                            Opération d'élimination
+                                        {% else %}
+                                            {{ log.entity_type }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>ID de l'entité</th>
+                                    <td>{{ log.entity_id }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="text-muted mb-3">Détails de l'action</h5>
+                        {% if details %}
+                            <table class="table table-sm">
+                                <tbody>
+                                    {% for key, value in details.items() %}
+                                    <tr>
+                                        <th style="width: 40%">{{ key }}</th>
+                                        <td style="width: 60%">{{ value }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <div class="alert alert-info">
+                                Aucun détail disponible pour cette action.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

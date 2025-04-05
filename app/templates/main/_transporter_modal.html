@@ -1,0 +1,36 @@
+<div class="modal fade" id="addTransporterModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nouveau transporteur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="newTransporterForm" method="POST" action="{{ url_for('main.add_transporter_ajax') }}" data-target="transporter_id">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="transporter_name" class="form-label">Nom</label>
+                        <input type="text" class="form-control" id="transporter_name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="transporter_siret" class="form-label">SIRET</label>
+                        <input type="text" class="form-control" id="transporter_siret" name="siret" required 
+                               pattern="\d{14}" maxlength="14" title="Le SIRET doit contenir 14 chiffres">
+                    </div>
+                    <div class="mb-3">
+                        <label for="transporter_address" class="form-label">Adresse</label>
+                        <textarea class="form-control" id="transporter_address" name="address" required rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="transporter_registration" class="form-label">N° Récépissé</label>
+                        <input type="text" class="form-control" id="transporter_registration" name="registration" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="content-header">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold" style="background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            Registre des déchets
+        </h1>
+        <a href="{{ url_for('main.create_record') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nouvel enregistrement
+        </a>
+    </div>
+
+    <div class="search-form card mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('main.index') }}" class="row g-3">
+                <div class="col-md-3">
+                    <div class="form-floating">
+                        {{ search_form.start_date(class="form-control", type="date") }}
+                        {{ search_form.start_date.label(class="form-label") }}
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-floating">
+                        {{ search_form.end_date(class="form-control", type="date") }}
+                        {{ search_form.end_date.label(class="form-label") }}
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-floating">
+                        {{ search_form.waste_type_id(class="form-select") }}
+                        {{ search_form.waste_type_id.label(class="form-label") }}
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-floating">
+                        {{ search_form.producer_id(class="form-select") }}
+                        {{ search_form.producer_id.label(class="form-label") }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        {{ search_form.destination(class="form-control") }}
+                        {{ search_form.destination.label(class="form-label") }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        {{ search_form.transporter_id(class="form-select") }}
+                        {{ search_form.transporter_id.label(class="form-label") }}
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Rechercher
+                        </button>
+                        {% if request.args %}
+                        <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i> Réinitialiser
+                        </a>
+                        <a href="{{ url_for('main.export_csv', **request.args) }}" class="btn btn-success">
+                            <i class="fas fa-file-csv"></i> Exporter CSV
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="records-container">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th class="sortable">Date</th>
+                        <th>Type de déchet</th>
+                        <th>Quantité</th>
+                        <th>Producteur</th>
+                        <th>Destination</th>
+                        <th>Transporteur</th>
+                        <th>N° Bordereau</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in records.items %}
+                    <tr>
+                        <td>{{ record.date.strftime('%d/%m/%Y') }}</td>
+                        <td>
+                            {% for entry in record.waste_entries %}
+                            <div class="mb-1 {% if not loop.last %}border-bottom pb-1{% endif %}">
+                                <span class="badge {% if entry.waste_type_ref.dangerous %}bg-danger{% else %}bg-secondary{% endif %}" 
+                                      data-bs-toggle="tooltip" title="{{ entry.waste_type_ref.dangerous|string|capitalize }}">
+                                    {{ entry.waste_type_ref.code }}
+                                </span>
+                                <small class="d-block text-muted">{{ entry.waste_type_ref.description }}</small>
+                            </div>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% for entry in record.waste_entries %}
+                            <div class="mb-1 {% if not loop.last %}border-bottom pb-1{% endif %}">
+                                {{ entry.quantity }} {{ entry.unit }}
+                            </div>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            <span data-bs-toggle="tooltip" title="{{ record.producer_ref.siret }}">
+                                {{ record.producer_ref.name }}
+                            </span>
+                        </td>
+                        <td>{{ record.destination }}</td>
+                        <td>
+                            <span data-bs-toggle="tooltip" title="{{ record.transporter_ref.siret }}">
+                                {{ record.transporter_ref.name }}
+                            </span>
+                            <small class="d-block text-muted">{{ record.transporter_ref.registration }}</small>
+                        </td>
+                        <td>{{ record.tracking_number }}</td>
+                        <td>
+                            <div class="btn-group float-end">
+                                <a href="{{ url_for('main.edit_record', id=record.id) }}" 
+                                   class="btn btn-sm btn-outline-primary" title="Modifier">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-danger"
+                                        data-bs-toggle="modal" data-bs-target="#deleteModal{{ record.id }}"
+                                        title="Supprimer">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+
+                            <div class="modal fade" id="deleteModal{{ record.id }}" tabindex="-1">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Confirmer la suppression</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Êtes-vous sûr de vouloir supprimer cet enregistrement ?</p>
+                                            <p class="text-muted mb-0">Cette action est irréversible.</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                            <form action="{{ url_for('main.delete_record', id=record.id) }}" method="POST" class="d-inline">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                                <button type="submit" class="btn btn-danger">Supprimer</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center py-5">
+                            <div class="text-muted">
+                                <i class="fas fa-inbox fa-3x mb-3"></i>
+                                <h5>Aucun enregistrement trouvé</h5>
+                                <p class="mb-0">Commencez par ajouter un nouvel enregistrement</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if records.pages > 1 %}
+        <nav aria-label="Navigation des pages" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item {{ 'disabled' if not records.has_prev }}">
+                    <a class="page-link" href="{{ url_for('main.index', page=records.prev_num, **request.args) if records.has_prev else '#' }}">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+                {% for page in records.iter_pages() %}
+                    {% if page %}
+                        <li class="page-item {{ 'active' if page == records.page }}">
+                            <a class="page-link" href="{{ url_for('main.index', page=page, **request.args) }}">{{ page }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                <li class="page-item {{ 'disabled' if not records.has_next }}">
+                    <a class="page-link" href="{{ url_for('main.index', page=records.next_num, **request.args) if records.has_next else '#' }}">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.content-header {
+    margin-bottom: 2rem;
+}
+
+.search-form {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+}
+
+.table th {
+    font-weight: 600;
+    border-top: none;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.badge {
+    font-size: 0.85rem;
+    padding: 0.4em 0.8em;
+}
+
+.pagination .page-link {
+    border-radius: 50%;
+    margin: 0 0.25rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background-color: var(--background-color);
+    color: var(--text-primary);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.pagination .page-item.disabled .page-link {
+    background-color: transparent;
+    color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+    .table-responsive {
+        margin: 0 -1rem;
+    }
+    
+    .search-form {
+        margin: 0 -1rem;
+        border-radius: 0;
+    }
+}
+</style>
+{% endblock %}

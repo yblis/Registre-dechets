@@ -1,0 +1,8 @@
+{% extends "main/base_reference.html" %}
+{% set title = "Types de déchets" %}
+{% set headers = ["Code", "Description", "Dangereux"] %}
+{% set fields = ["code", "description", "dangerous"] %}
+{% set list_endpoint = "main.list_waste_types" %}
+{% set add_endpoint = "main.add_waste_type" %}
+{% set edit_endpoint = "main.edit_waste_type" %}
+{% set delete_endpoint = "main.delete_waste_type" %}
