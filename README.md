@@ -43,13 +43,22 @@ Application de gestion de registre de déchets avec support pour plusieurs types
 
 4. Initialiser la base de données:
    ```bash
-   docker-compose exec web flask db upgrade
+   # Rendre le script d'initialisation exécutable
+   chmod +x init_db.sh
+   
+   # Exécuter le script d'initialisation dans le conteneur
+   docker-compose exec web ./init_db.sh
    ```
 
-5. Créer un utilisateur administrateur:
-   ```bash
-   docker-compose exec web flask create-admin
+   **IMPORTANT**: Cette étape est cruciale car elle crée les tables dans la base de données PostgreSQL. Sans cela, vous verrez des erreurs comme:
    ```
+   sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedTable) relation "user" does not exist
+   ```
+
+   Le script d'initialisation:
+   - Attend que la base de données soit prête
+   - Exécute les migrations pour créer les tables
+   - Crée un utilisateur administrateur à partir des variables d'environnement
 
 ### Intégration avec Traefik
 
