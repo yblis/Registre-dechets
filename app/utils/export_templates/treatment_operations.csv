@@ -1,14 +1,2 @@
 code,description
 R1,Utilisation principale comme combustible ou autre moyen de produire de l'énergie
-R2,Récupération ou régénération des solvants
-R3,Recyclage ou récupération des substances organiques qui ne sont pas utilisées comme solvants
-R4,Recyclage ou récupération des métaux et des composés métalliques
-R5,Recyclage ou récupération d'autres matières inorganiques
-R6,Régénération des acides ou des bases
-R7,Récupération des produits servant à capter les polluants
-R8,Récupération des produits provenant des catalyseurs
-R9,Régénération ou autres réemplois des huiles
-R10,Épandage sur le sol au profit de l'agriculture ou de l'écologie
-R11,Utilisation de déchets résiduels obtenus à partir de l'une des opérations R1 à R10
-R12,Échange de déchets en vue de les soumettre à l'une des opérations R1 à R11
-R13,Stockage de déchets préalablement à l'une des opérations R1 à R12
