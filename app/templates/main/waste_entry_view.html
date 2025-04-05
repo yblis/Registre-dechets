@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Bordereau n° {{ record.tracking_number }}</h4>
+            <a href="{{ url_for('main.index') }}" class="btn btn-outline-light btn-sm">
+                <i class="fas fa-arrow-left"></i> Retour
+            </a>
+        </div>
+        <div class="card-body">
+            <div class="row g-4">
+                <!-- Informations générales -->
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="text-primary mb-0">Informations générales</h5>
+                        <span class="badge bg-secondary">{{ record.date.strftime('%d/%m/%Y') }}</span>
+                    </div>
+                    <hr>
+                </div>
+
+                <!-- Producteur -->
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="card-title text-primary">
+                                <i class="fas fa-industry me-2"></i>Producteur
+                            </h6>
+                            <p class="card-text">
+                                <strong>{{ record.producer_ref.name }}</strong><br>
+                                <small class="text-muted">SIRET: {{ record.producer_ref.siret }}</small><br>
+                                {{ record.producer_ref.address|replace('\n', '<br>')|safe }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transporteur -->
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="card-title text-primary">
+                                <i class="fas fa-truck me-2"></i>Transporteur
+                            </h6>
+                            <p class="card-text">
+                                <strong>{{ record.transporter_ref.name }}</strong><br>
+                                <small class="text-muted">SIRET: {{ record.transporter_ref.siret }}</small><br>
+                                <small class="text-muted">N° Immatriculation: {{ record.transporter_ref.registration }}</small><br>
+                                {{ record.transporter_ref.address|replace('\n', '<br>')|safe }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Destination -->
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title text-primary">
+                                <i class="fas fa-map-marker-alt me-2"></i>Destination
+                            </h6>
+                            <p class="card-text">{{ record.destination }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Déchets -->
+                <div class="col-12">
+                    <h5 class="text-primary mb-3">Détail des déchets</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Type de déchet</th>
+                                    <th>Code</th>
+                                    <th>Quantité</th>
+                                    <th>Traitement</th>
+                                    <th>Élimination</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for entry in record.waste_entries %}
+                                <tr>
+                                    <td>
+                                        <span class="badge {% if entry.waste_type_ref.dangerous %}bg-danger{% else %}bg-secondary{% endif %} me-2">
+                                            {{ entry.waste_type_ref.code }}
+                                        </span>
+                                        {{ entry.waste_type_ref.description }}
+                                    </td>
+                                    <td>{{ entry.waste_type_ref.code }}</td>
+                                    <td>{{ entry.quantity }} {{ entry.unit }}</td>
+                                    <td>
+                                        <span data-bs-toggle="tooltip" title="{{ entry.treatment_operation_ref.description }}">
+                                            {{ entry.treatment_operation_ref.code }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if entry.elimination_operation_ref %}
+                                        <span data-bs-toggle="tooltip" title="{{ entry.elimination_operation_ref.description }}">
+                                            {{ entry.elimination_operation_ref.code }}
+                                        </span>
+                                        {% else %}
+                                        -
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {% if record.notes %}
+                <!-- Notes -->
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title text-primary">
+                                <i class="fas fa-sticky-note me-2"></i>Notes
+                            </h6>
+                            <p class="card-text">{{ record.notes|replace('\n', '<br>')|safe }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+.badge {
+    font-size: 0.85rem;
+    padding: 0.4em 0.8em;
+}
+.table {
+    margin-bottom: 0;
+}
+.table th {
+    font-weight: 600;
+}
+</style>
+{% endblock %}

@@ -121,6 +121,10 @@
                         <td>{{ record.tracking_number }}</td>
                         <td>
                             <div class="btn-group float-end">
+                                <a href="{{ url_for('main.view_record', id=record.id) }}" 
+                                   class="btn btn-sm btn-outline-secondary me-1" title="Voir">
+                                    <i class="fas fa-eye"></i>
+                                </a>
                                 <a href="{{ url_for('main.edit_record', id=record.id) }}" 
                                    class="btn btn-sm btn-outline-primary" title="Modifier">
                                     <i class="fas fa-edit"></i>

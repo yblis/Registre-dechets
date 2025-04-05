@@ -10,9 +10,13 @@ function addWasteEntry() {
         const html = firstEntry.innerHTML.replace(/waste_entries-0/g, `waste_entries-${entryCount}`);
         template.innerHTML = html;
         
-        // Clear any values in the cloned form
+        // Clear any values in the cloned form except treatment and elimination operation selects
         template.querySelectorAll('input, select').forEach(input => {
-            if (input.type === 'number') {
+            const isOperationSelect = input.name && (
+                input.name.includes('treatment_operation_id') || 
+                input.name.includes('elimination_operation_id')
+            );
+            if (input.type === 'number' || !isOperationSelect) {
                 input.value = '';
             }
         });
@@ -38,9 +42,13 @@ function removeWasteEntry(button) {
         // If it's the last entry, just clear the values
         const entry = entries[0];
         entry.querySelectorAll('input, select').forEach(input => {
-            if (input.type === 'number') {
+            const isOperationSelect = input.name && (
+                input.name.includes('treatment_operation_id') || 
+                input.name.includes('elimination_operation_id')
+            );
+            if (input.type === 'number' || !isOperationSelect) {
                 input.value = '';
-            } else if (input.tagName === 'SELECT') {
+            } else if (input.tagName === 'SELECT' && !isOperationSelect) {
                 input.selectedIndex = 0;
             }
         });

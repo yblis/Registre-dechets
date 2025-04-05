@@ -1,7 +1,7 @@
 import csv
 from datetime import datetime
 from io import StringIO
-from flask import render_template, redirect, url_for, flash, request, send_file, jsonify
+from flask import render_template, redirect, url_for, flash, request, send_file, jsonify, abort
 from flask_login import login_required, current_user
 from app.utils import log_activity
 from sqlalchemy import and_, exists
@@ -66,8 +66,6 @@ def create_record():
             producer_id=form.producer_id.data,
             destination=form.destination.data,
             transporter_id=form.transporter_id.data,
-            treatment_operation_id=form.treatment_operation_id.data,
-            elimination_operation_id=form.elimination_operation_id.data or None,
             tracking_number=form.tracking_number.data,
             notes=form.notes.data,
             author=current_user
@@ -76,10 +74,12 @@ def create_record():
             waste_entry = WasteEntry(
                 waste_type_id=entry_form.waste_type_id.data,
                 quantity=entry_form.quantity.data,
-                unit=entry_form.unit.data
+                unit=entry_form.unit.data,
+                treatment_operation_id=entry_form.treatment_operation_id.data,
+                elimination_operation_id=entry_form.elimination_operation_id.data or None
             )
             record.waste_entries.append(waste_entry)
-            
+        
         db.session.add(record)
         try:
             db.session.commit()
@@ -111,7 +111,9 @@ def edit_record(id):
             form.waste_entries.append_entry({
                 'waste_type_id': entry.waste_type_id,
                 'quantity': entry.quantity,
-                'unit': entry.unit
+                'unit': entry.unit,
+                'treatment_operation_id': entry.treatment_operation_id,
+                'elimination_operation_id': entry.elimination_operation_id
             })
     else:
         form = WasteRecordForm()
@@ -120,8 +122,6 @@ def edit_record(id):
             record.producer_id = form.producer_id.data
             record.destination = form.destination.data
             record.transporter_id = form.transporter_id.data
-            record.treatment_operation_id = form.treatment_operation_id.data
-            record.elimination_operation_id = form.elimination_operation_id.data or None
             record.tracking_number = form.tracking_number.data
             record.notes = form.notes.data
             
@@ -131,7 +131,9 @@ def edit_record(id):
                 waste_entry = WasteEntry(
                     waste_type_id=entry_form.waste_type_id.data,
                     quantity=entry_form.quantity.data,
-                    unit=entry_form.unit.data
+                    unit=entry_form.unit.data,
+                    treatment_operation_id=entry_form.treatment_operation_id.data,
+                    elimination_operation_id=entry_form.elimination_operation_id.data or None
                 )
                 record.waste_entries.append(waste_entry)
             
@@ -150,6 +152,13 @@ def edit_record(id):
                 flash('Erreur: Le numéro de bordereau doit être unique.', 'danger')
     return render_template('main/record_form.html', title='Modifier l\'enregistrement',
                          form=form)
+
+@bp.route('/record/<int:id>/view')
+@login_required
+def view_record(id):
+    record = WasteRecord.query.get_or_404(id)
+    return render_template('main/waste_entry_view.html', title=f'Bordereau n° {record.tracking_number}',
+                         record=record)
 
 @bp.route('/record/<int:id>/delete', methods=['POST'])
 @login_required
@@ -229,8 +238,8 @@ def export_csv():
                 record.transporter_ref.name,
                 record.transporter_ref.siret,
                 record.transporter_ref.registration,
-                f"{record.treatment_operation_ref.code} - {record.treatment_operation_ref.description}",
-                f"{record.elimination_operation_ref.code} - {record.elimination_operation_ref.description}" if record.elimination_operation_ref else "",
+                f"{waste_entry.treatment_operation_ref.code} - {waste_entry.treatment_operation_ref.description}",
+                f"{waste_entry.elimination_operation_ref.code} - {waste_entry.elimination_operation_ref.description}" if waste_entry.elimination_operation_ref else "",
                 record.tracking_number,
                 record.notes
             ])

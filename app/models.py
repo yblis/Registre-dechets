@@ -43,9 +43,13 @@ class WasteEntry(db.Model):
     waste_type_id = db.Column(db.Integer, db.ForeignKey('waste_type.id'), nullable=False)
     quantity = db.Column(db.Float, nullable=False)
     unit = db.Column(db.String(10), nullable=False)
+    treatment_operation_id = db.Column(db.Integer, db.ForeignKey('treatment_operation.id'), nullable=False)
+    elimination_operation_id = db.Column(db.Integer, db.ForeignKey('elimination_operation.id'), nullable=True)
     
     # Relations
     waste_type_ref = db.relationship('WasteType', backref='entries')
+    treatment_operation_ref = db.relationship('TreatmentOperation', backref='entries')
+    elimination_operation_ref = db.relationship('EliminationOperation', backref='entries')
     
     def __repr__(self):
         return f'<WasteEntry {self.waste_type_ref.code} - {self.quantity} {self.unit}>'
@@ -56,8 +60,6 @@ class WasteRecord(db.Model):
     producer_id = db.Column(db.Integer, db.ForeignKey('producer.id'), nullable=False)
     destination = db.Column(db.String(128), nullable=False)
     transporter_id = db.Column(db.Integer, db.ForeignKey('transporter.id'), nullable=False)
-    treatment_operation_id = db.Column(db.Integer, db.ForeignKey('treatment_operation.id'), nullable=False)
-    elimination_operation_id = db.Column(db.Integer, db.ForeignKey('elimination_operation.id'), nullable=True)
     tracking_number = db.Column(db.String(64), unique=True, nullable=False)
     notes = db.Column(db.Text, nullable=True)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
@@ -67,8 +69,6 @@ class WasteRecord(db.Model):
     waste_entries = db.relationship('WasteEntry', backref='record', lazy='dynamic', cascade='all, delete-orphan')
     producer_ref = db.relationship('Producer', backref='records')
     transporter_ref = db.relationship('Transporter', backref='records')
-    treatment_operation_ref = db.relationship('TreatmentOperation', backref='records')
-    elimination_operation_ref = db.relationship('EliminationOperation', backref='records')
 
     def __repr__(self):
         return f'<WasteRecord {self.tracking_number}>'

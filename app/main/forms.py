@@ -10,6 +10,9 @@ class WasteEntryForm(FlaskForm):
         ('kg', 'Kilogrammes'),
         ('tons', 'Tonnes')
     ])
+    treatment_operation_id = SelectField('Opération de traitement prévue', coerce=int, validators=[DataRequired()])
+    elimination_operation_id = SelectField('Opération d\'élimination', validators=[Optional()], 
+        coerce=lambda x: int(x) if x and x != 'None' else None)
 
     class Meta:
         csrf = False
@@ -18,6 +21,10 @@ class WasteEntryForm(FlaskForm):
         super(WasteEntryForm, self).__init__(*args, **kwargs)
         self.waste_type_id.choices = [(wt.id, f"{wt.code} - {wt.description}") 
                                     for wt in WasteType.query.order_by(WasteType.code).all()]
+        self.treatment_operation_id.choices = [(op.id, f"{op.code} - {op.description}") 
+                                            for op in TreatmentOperation.query.order_by(TreatmentOperation.code).all()]
+        self.elimination_operation_id.choices = [('None', 'Aucune')] + [(op.id, f"{op.code} - {op.description}") 
+                                              for op in EliminationOperation.query.order_by(EliminationOperation.code).all()]
 
 class WasteRecordForm(FlaskForm):
     date = DateField('Date d\'entrée', validators=[DataRequired()])
@@ -25,9 +32,6 @@ class WasteRecordForm(FlaskForm):
     producer_id = SelectField('Producteur', coerce=int, validators=[DataRequired()])
     destination = StringField('Destination', validators=[DataRequired(), Length(max=128)])
     transporter_id = SelectField('Transporteur', coerce=int, validators=[DataRequired()])
-    treatment_operation_id = SelectField('Opération de traitement prévue', coerce=int, validators=[DataRequired()])
-    elimination_operation_id = SelectField('Opération d\'élimination', validators=[Optional()], 
-        coerce=lambda x: int(x) if x and x != 'None' else None)
     tracking_number = StringField('N° Bordereau', validators=[DataRequired(), Length(max=64)])
     notes = TextAreaField('Remarques', validators=[Optional(), Length(max=500)])
     submit = SubmitField('Enregistrer')
@@ -38,10 +42,6 @@ class WasteRecordForm(FlaskForm):
                                   for p in Producer.query.order_by(Producer.name).all()]
         self.transporter_id.choices = [(t.id, f"{t.name} ({t.registration})") 
                                      for t in Transporter.query.order_by(Transporter.name).all()]
-        self.treatment_operation_id.choices = [(op.id, f"{op.code} - {op.description}") 
-                                             for op in TreatmentOperation.query.order_by(TreatmentOperation.code).all()]
-        self.elimination_operation_id.choices = [('None', 'Aucune')] + [(op.id, f"{op.code} - {op.description}") 
-                                              for op in EliminationOperation.query.order_by(EliminationOperation.code).all()]
 
 class SearchForm(FlaskForm):
     start_date = DateField('Date de début', validators=[Optional()])
