@@ -23,7 +23,8 @@ def import_producers():
         for row in reader:
             producer = Producer(
                 name=row['name'],
-                siret=row['siret']
+                siret=row['siret'],
+                address=row.get('address', 'Adresse non spécifiée')  # Ajout d'une adresse par défaut
             )
             db.session.add(producer)
 
@@ -34,7 +35,8 @@ def import_transporters():
             transporter = Transporter(
                 name=row['name'],
                 siret=row['siret'],
-                registration=row['registration']
+                registration=row['registration'],
+                address=row.get('address', 'Adresse non spécifiée')  # Ajout d'une adresse par défaut
             )
             db.session.add(transporter)
 
