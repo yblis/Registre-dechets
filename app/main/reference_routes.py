@@ -419,8 +419,10 @@ def import_reference_data(entity_type):
                   f'Mis à jour : {results["updated"]}', 'success')
     except Exception as e:
         flash(f'Erreur lors de l\'import : {str(e)}', 'danger')
-        
-    return redirect(request.referrer or url_for('main.list_' + entity_type))
+    
+    # Rediriger vers la première page après l'import pour assurer que les données sont visibles
+    # Ajouter un paramètre refresh pour forcer l'actualisation
+    return redirect(url_for('main.list_' + entity_type.replace('-', '_'), page=1, refresh=True))
 
 @bp.route('/elimination-operations/<int:id>/edit', methods=['POST'])
 @login_required
