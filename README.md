@@ -22,7 +22,7 @@ Application de gestion de registre de déchets avec support pour plusieurs types
 
 1. Cloner le dépôt:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/yblis/Registre-dechets
    cd registre-dechets
    ```
 
