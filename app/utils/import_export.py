@@ -90,59 +90,51 @@ class ImportExportManager:
             'updated': 0,
             'errors': []
         }
-
-        db.session.begin_nested()  # Créer un savepoint
         
         # Traiter chaque ligne
         for row in reader:
             try:
-                with db.session.no_autoflush:  # Désactiver l'autoflush
-                    # Convertir les données
-                    data = {}
-                    for key, value in row.items():
-                        if key == 'dangerous':
-                            # Convertir 'true'/'false' en bool
-                            data[key] = value.lower() == 'true'
-                        else:
-                            data[key] = value
-                    
-                    # Rechercher l'instance existante
-                    if entity_type == 'waste_types':
-                        instance = model.query.filter_by(code=data['code']).first()
-                    elif entity_type == 'transporters':
-                        instance = model.query.filter_by(registration=data['registration']).first()
-                    elif entity_type in ['producers']:
-                        instance = model.query.filter_by(siret=data['siret']).first()
+                # Convertir les données
+                data = {}
+                for key, value in row.items():
+                    if key == 'dangerous':
+                        # Convertir 'true'/'false' en bool
+                        data[key] = value.lower() == 'true'
                     else:
-                        instance = model.query.filter_by(code=data['code']).first()
-                    
-                    if instance:
-                        # Mettre à jour l'instance existante
-                        for key, value in data.items():
-                            setattr(instance, key, value)
-                        results['updated'] += 1
-                    else:
-                        # Créer une nouvelle instance
-                        instance = model(**data)
-                        db.session.add(instance)
-                        results['created'] += 1
-                    
-                    # Commit partiel après chaque ligne réussie
-                    db.session.flush()
+                        data[key] = value
+                
+                # Rechercher l'instance existante
+                if entity_type == 'waste_types':
+                    instance = model.query.filter_by(code=data['code']).first()
+                elif entity_type == 'transporters':
+                    instance = model.query.filter_by(registration=data['registration']).first()
+                elif entity_type in ['producers']:
+                    instance = model.query.filter_by(siret=data['siret']).first()
+                else:
+                    instance = model.query.filter_by(code=data['code']).first()
+                
+                if instance:
+                    # Mettre à jour l'instance existante
+                    for key, value in data.items():
+                        setattr(instance, key, value)
+                    results['updated'] += 1
+                else:
+                    # Créer une nouvelle instance
+                    instance = model(**data)
+                    db.session.add(instance)
+                    results['created'] += 1
+                
+                # Commit après chaque ligne pour éviter les problèmes de transaction
+                db.session.commit()
 
             except Exception as e:
-                db.session.rollback()  # Rollback au dernier savepoint
+                db.session.rollback()
                 results['errors'].append(f"Ligne {results['created'] + results['updated'] + 2}: {str(e)}")
                 continue
 
-        # Commit final si pas d'erreurs
-        try:
-            if not results['errors']:
-                db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            results['errors'].append(f"Erreur lors du commit final: {str(e)}")
-
+        # Forcer une actualisation complète de la session à la fin
+        db.session.expire_all()
+        
         return results
 
     @classmethod
