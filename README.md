@@ -38,23 +38,27 @@ Application de gestion de registre de déchets avec support pour plusieurs types
 
 3. Démarrer l'application:
    ```bash
-   docker-compose up -d
-   ```
-
-   L'application va automatiquement:
-   - Attendre que la base de données soit prête
-   - Créer les tables nécessaires
-   - Créer un utilisateur administrateur s'il n'existe pas déjà
+   # Construire et démarrer les conteneurs
+   docker-compose up -d --build
    
-   Vous pouvez suivre l'initialisation avec:
-   ```bash
-   docker-compose logs -f web
+   # Suivre les logs d'initialisation (facultatif)
+   docker-compose logs -f
    ```
 
-   **Note**: Les identifiants de l'administrateur sont définis par les variables d'environnement:
-   - `ADMIN_USERNAME` (par défaut: "admin")
-   - `ADMIN_EMAIL` (par défaut: "admin@example.com")
-   - `ADMIN_PASSWORD` (par défaut: "admin123")
+   Le processus d'initialisation automatique:
+   1. Attend que PostgreSQL soit prêt (vérification avec pg_isready)
+   2. Exécute les migrations de la base de données
+   3. Vérifie si un administrateur existe
+   4. Crée l'administrateur si nécessaire avec les identifiants suivants:
+      - Username: `${ADMIN_USERNAME:-admin}`
+      - Email: `${ADMIN_EMAIL:-admin@example.com}`
+      - Password: `${ADMIN_PASSWORD:-admin123}`
+      
+   Ces valeurs peuvent être configurées dans le fichier `.env`
+
+   Une fois l'initialisation terminée, l'application est accessible sur:
+   - URL: http://localhost:8000 (ou votre domaine configuré)
+   - Connexion avec les identifiants admin définis ci-dessus
 
 ### Intégration avec Traefik
 
@@ -121,6 +125,57 @@ docker-compose build
 docker-compose up -d
 docker-compose exec web flask db upgrade
 ```
+
+## Dépannage
+
+### Problèmes courants
+
+1. L'application ne démarre pas:
+   ```bash
+   # Vérifier les logs des conteneurs
+   docker-compose logs -f
+   
+   # Reconstruire l'image sans cache
+   docker-compose build --no-cache web
+   docker-compose up -d
+   ```
+
+2. La base de données n'est pas initialisée:
+   ```bash
+   # Vérifier les logs de la base de données
+   docker-compose logs db
+   
+   # En cas de problème, réinitialiser les volumes
+   docker-compose down -v
+   docker-compose up -d
+   ```
+
+3. L'utilisateur admin n'est pas créé:
+   ```bash
+   # Vérifier les variables d'environnement
+   docker-compose exec web env | grep ADMIN
+   
+   # Créer manuellement l'admin si nécessaire
+   docker-compose exec web python3 -c "
+   from app import create_app, db
+   from app.models import User
+   app = create_app()
+   with app.app_context():
+       if not User.query.filter_by(is_admin=True).first():
+           admin = User(username='admin', email='admin@example.com', is_admin=True, active=True)
+           admin.set_password('admin123')
+           db.session.add(admin)
+           db.session.commit()
+           print('Admin créé avec succès')
+   "
+   ```
+
+4. Erreurs de permissions:
+   ```bash
+   # Vérifier les permissions des volumes
+   sudo chown -R 999:999 ./db-data  # Pour PostgreSQL
+   sudo chown -R 1000:1000 ./app-data  # Pour l'application
+   ```
 
 ## Licence
 

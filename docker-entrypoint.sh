@@ -19,9 +19,16 @@ fi
 
 # Check if admin user exists and create if needed
 echo "Checking admin user..."
-if ! flask shell <<EOF
+python3 <<EOF
+from flask import current_app
+from flask.cli import ScriptInfo
+from app import create_app
 from app.models import User
 from app import db
+
+app = create_app()
+app.app_context().push()
+
 admin = User.query.filter_by(is_admin=True).first()
 if not admin:
     print("Creating admin user...")
@@ -37,14 +44,7 @@ if not admin:
     print("Admin user created successfully")
 else:
     print("Admin user already exists")
-exit(0)
 EOF
-then
-    echo "Creating admin user..."
-    flask create-admin-env
-else
-    echo "Admin user already exists"
-fi
 
 # Start the application
 echo "Starting gunicorn..."
