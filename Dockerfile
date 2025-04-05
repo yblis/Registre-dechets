@@ -1,34 +1,39 @@
-FROM python:3.13-slim
+FROM python:3.11-slim
 
 # Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app \
+    PATH="/home/appuser/.local/bin:$PATH"
 
-# Set working directory
-WORKDIR /app
+# Create a non-root user
+RUN useradd --create-home appuser
 
 # Install system dependencies
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y --no-install-recommends \
         gcc \
+        libc6-dev \
         libpq-dev \
         curl \
         postgresql-client \
+        python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Set working directory and change ownership
+WORKDIR /app
+RUN chown appuser:appuser /app
 
-# Copy application code
-COPY . .
-
-# Create a non-root user
-RUN useradd -m appuser && chown -R appuser:appuser /app
+# Switch to non-root user
 USER appuser
 
-# Copy and set entrypoint script
-COPY docker-entrypoint.sh .
+# Install Python dependencies
+COPY --chown=appuser:appuser requirements.txt .
+RUN pip install --user --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY --chown=appuser:appuser . .
+
+# Make entrypoint script executable
 RUN chmod +x docker-entrypoint.sh
 
 # Run entrypoint script
