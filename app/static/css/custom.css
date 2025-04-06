@@ -1,4 +1,5 @@
 :root {
+    /* Light theme (default) */
     --primary-color: #007AFF;
     --secondary-color: #5856D6;
     --success-color: #34C759;
@@ -11,6 +12,112 @@
     --border-radius: 12px;
     --spacing-unit: 16px;
     --transition-speed: 0.3s;
+    --navbar-bg: rgba(255, 255, 255, 0.95);
+    --navbar-border: rgba(0, 0, 0, 0.1);
+    --input-bg: #FFFFFF;
+    --input-border: rgba(0, 0, 0, 0.1);
+    --dropdown-bg: #FFFFFF;
+    --table-header-bg: #f8f9fa;
+    --table-border: rgba(0, 0, 0, 0.05);
+    --shadow-color: rgba(0, 0, 0, 0.05);
+    --hover-bg: rgba(0, 0, 0, 0.05);
+    --table-bg: #FFFFFF; /* Ajout de la variable pour l'arrière-plan du tableau */
+    --toast-bg: #FFFFFF; /* Ajout pour les notifications toast */
+    --text-muted: #6C6C6C;
+    --card-title-color: #007AFF;
+    --search-form-bg: rgba(255, 255, 255, 0.8);
+}
+
+/* Dark theme */
+[data-theme="dark"] {
+    --background-color: #1A1A1A;
+    --card-background: #2D2D2D;
+    --text-primary: #FFFFFF;
+    --text-secondary: #B0B0B0;
+    --navbar-bg: rgba(45, 45, 45, 0.95);
+    --navbar-border: rgba(255, 255, 255, 0.1);
+    --input-bg: #3D3D3D;
+    --input-border: rgba(255, 255, 255, 0.1);
+    --dropdown-bg: #3D3D3D;
+    --table-header-bg: #2D2D2D;
+    --table-border: rgba(255, 255, 255, 0.1);
+    --shadow-color: rgba(0, 0, 0, 0.2);
+    --hover-bg: rgba(255, 255, 255, 0.1);
+    --table-bg: #2D2D2D; /* Ajout de la couleur d'arrière-plan du tableau en mode sombre */
+    --toast-bg: #2D2D2D; /* Ajout pour les notifications toast */
+    --text-muted: #B0B0B0;
+    --card-title-color: #5AC8FA;
+    --search-form-bg: rgba(45, 45, 45, 0.8);
+}
+
+/* Correction pour la visibilité des titres h4/h5 en mode sombre */
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] .h4,
+[data-theme="dark"] .h5 {
+    color: var(--text-primary);
+}
+
+/* Correction spécifique pour les étiquettes des formulaires */
+.form-label, 
+.form-floating label {
+    border-bottom: none !important;
+    background-image: none !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+}
+
+[data-theme="dark"] .form-label, 
+[data-theme="dark"] .form-floating label {
+    border-bottom: none !important;
+    background-image: none !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+}
+
+/* Amélioration supplémentaire pour l'apparence des labels flottants */
+.form-floating > label {
+    display: block;
+    width: auto;
+}
+
+/* Correction pour le trait sous les labels des formulaires flottants */
+.form-floating>.form-control-plaintext~label::after,
+.form-floating>.form-control:focus~label::after,
+.form-floating>.form-control:not(:placeholder-shown)~label::after,
+.form-floating>.form-select~label::after {
+    content: "";
+    position: absolute;
+    height: 0; /* Réduire la hauteur à 0 pour éliminer complètement le trait */
+    z-index: -1;
+    inset: 1rem 0.375rem;
+    border-radius: var(--bs-border-radius);
+    /* Suppression de background-color: var(--bs-body-bg); */
+}
+
+/* Style supplémentaire pour garantir que le fond des labels est compatible avec le thème */
+[data-theme="dark"] .form-floating>.form-control-plaintext~label,
+[data-theme="dark"] .form-floating>.form-control:focus~label,
+[data-theme="dark"] .form-floating>.form-control:not(:placeholder-shown)~label,
+[data-theme="dark"] .form-floating>.form-select~label {
+    background-color: transparent; /* Fond transparent pour éviter tout trait */
+    padding: 0 0.5rem;
+}
+
+/* Rendre le texte des étiquettes plus visible en mode sombre */
+[data-theme="dark"] .form-floating label {
+    color: var(--text-muted);
+    text-shadow: 0px 0px 2px rgba(0, 0, 0, 0.5); /* Ajouter une légère ombre pour améliorer la lisibilité */
+}
+
+/* Correction pour l'icône du menu hamburger en mode sombre */
+[data-theme="dark"] .navbar-toggler-icon {
+    filter: invert(1);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.85%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+[data-theme="dark"] .navbar-toggler {
+    border-color: rgba(255, 255, 255, 0.3);
 }
 
 /* General Layout */
@@ -20,21 +127,27 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
-    padding-top: 80px; /* Augmenté pour laisser plus d'espace sous la navbar */
-    margin: 1rem 0; /* Ajout d'une marge pour éviter la troncature */
+    padding-top: 100px; /* Augmentation de la valeur de 80px à 100px */
+    margin: 1rem 0;
     min-height: 100vh;
-}
-
-.container {
-    padding: var(--spacing-unit);
-    max-width: 1200px;
 }
 
 /* Ajustement du conteneur principal */
 .container.content {
-    margin-top: 0.5rem !important; /* Changé de négatif à positif pour éviter la troncature */
-    padding-top: 0.5rem;
+    margin-top: 1.5rem !important; /* Augmentation de la marge supérieure */
+    padding-top: 1rem; /* Augmentation du padding supérieur */
     width: 100%;
+}
+
+/* Ajout d'un espacement pour la page d'accueil */
+.content-header {
+    margin-top: 1rem; /* Ajout d'une marge en haut du contenu de la page d'accueil */
+    margin-bottom: 2rem;
+}
+
+/* Ajustement pour tous les titres de page */
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 0.5rem; /* Ajout d'une marge en haut des titres */
 }
 
 /* Ajustement pour s'assurer que les formulaires commencent assez haut */
@@ -52,19 +165,19 @@ body {
     background: var(--card-background);
     border-radius: var(--border-radius);
     border: none;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 8px var(--shadow-color);
     transition: transform var(--transition-speed), box-shadow var(--transition-speed);
     margin-bottom: var(--spacing-unit);
 }
 
 .card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 12px var(--shadow-color);
 }
 
 .card-header {
     background: var(--card-background);
-    border-bottom: 1px solid rgba(0,0,0,0.1);
+    border-bottom: 1px solid var(--table-border);
     padding: calc(var(--spacing-unit) * 1.25);
     border-top-left-radius: var(--border-radius);
     border-top-right-radius: var(--border-radius);
@@ -76,16 +189,16 @@ body {
 
 /* Navigation */
 .navbar {
-    background: rgba(255,255,255,0.95) !important;
-    min-height: 80px; /* Augmenté et changé en min-height pour plus de flexibilité */
+    background: var(--navbar-bg) !important;
+    min-height: 80px;
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(0,0,0,0.1);
+    border-bottom: 1px solid var(--navbar-border);
     z-index: 1030;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    padding: 0.5rem 0; /* Ajouter du padding vertical */
+    padding: 0.5rem 0;
 }
 
 .navbar-brand {
@@ -93,18 +206,18 @@ body {
     color: var(--text-primary) !important;
     padding: 0.25rem 0;
     font-size: 1.25rem;
-    white-space: normal; /* Permettre le retour à la ligne si nécessaire */
-    max-width: 200px; /* Limiter la largeur */
+    white-space: normal;
+    max-width: 200px;
 }
 
 .navbar > .container {
-    min-height: 80px; /* Ajusté pour correspondre à la nouvelle hauteur de navbar */
+    min-height: 80px;
     display: flex;
     align-items: center;
     padding-left: 15px;
     padding-right: 15px;
     width: 100%;
-    max-width: 1230px; /* 1200px + 15px padding de chaque côté */
+    max-width: 1230px;
 }
 
 .nav-link {
@@ -114,7 +227,11 @@ body {
     border-radius: 8px;
     transition: background-color var(--transition-speed);
     line-height: 1.2;
-    white-space: nowrap; /* Éviter les retours à la ligne dans les liens de navigation */
+    white-space: nowrap;
+}
+
+.nav-link:hover {
+    background-color: var(--hover-bg);
 }
 
 /* Assurer que les éléments de navigation ne se superposent pas */
@@ -124,15 +241,28 @@ body {
 }
 
 .navbar-nav .nav-item {
-    margin: 0 2px; /* Ajouter un peu d'espace entre les éléments */
+    margin: 0 2px;
+}
+
+/* Theme toggle button styles */
+#theme-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+#theme-toggle:hover {
+    background-color: var(--hover-bg);
+    border-radius: 8px;
 }
 
 /* Améliorer la navbar en responsive */
 @media (max-width: 991px) {
     .navbar-collapse {
-        background-color: rgba(255,255,255,0.98);
+        background-color: var(--navbar-bg);
         border-radius: var(--border-radius);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 12px var(--shadow-color);
         position: absolute;
         top: 70px;
         left: 0;
@@ -162,22 +292,28 @@ body {
         margin-top: 0.5rem;
         margin-bottom: 0.5rem;
         box-shadow: none;
-        border: 1px solid rgba(0,0,0,0.05);
+        border: 1px solid var(--input-border);
+        background-color: var(--dropdown-bg);
+        color: var(--text-primary);
     }
 }
 
 /* Forms */
 .form-control, .form-select {
     border-radius: 8px;
-    border: 1px solid rgba(0,0,0,0.1);
+    border: 1px solid var(--input-border);
     padding: calc(var(--spacing-unit) * 0.75);
     transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
     font-size: 0.95rem;
+    background-color: var(--input-bg);
+    color: var(--text-primary);
 }
 
 .form-control:focus, .form-select:focus {
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(0,122,255,0.1);
+    background-color: var(--input-bg);
+    color: var(--text-primary);
 }
 
 .form-label {
@@ -211,18 +347,18 @@ body {
 
 /* Record Form Specific */
 .record-form .card {
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 20px var(--shadow-color);
 }
 
 .record-form .form-control, 
 .record-form .form-select {
-    background-color: #f8f9fa;
-    border: 1px solid #e9ecef;
+    background-color: var(--input-bg);
+    border: 1px solid var(--input-border);
 }
 
 .record-form .form-control:focus,
 .record-form .form-select:focus {
-    background-color: #fff;
+    background-color: var(--input-bg);
 }
 
 .record-form .btn-outline-secondary:hover {
@@ -238,7 +374,7 @@ body {
     }
     
     .record-form .input-group .form-select {
-        min-width: 0;  /* Permet au select de se rétrécir */
+        min-width: 0;
         flex: 1;
     }
     
@@ -253,7 +389,6 @@ body {
         margin-bottom: 1rem;
     }
 
-    /* Empêcher le texte de déborder dans les selects */
     .record-form select {
         text-overflow: ellipsis;
         overflow: hidden;
@@ -272,6 +407,7 @@ body {
 .btn-primary {
     background-color: var(--primary-color);
     border: none;
+    color: white;
 }
 
 .btn-primary:hover {
@@ -281,13 +417,13 @@ body {
 }
 
 .btn-outline-secondary {
-    border-color: rgba(0,0,0,0.1);
+    border-color: var(--input-border);
     color: var(--text-primary);
 }
 
 .btn-outline-secondary:hover {
-    background-color: rgba(0,0,0,0.05);
-    border-color: rgba(0,0,0,0.2);
+    background-color: var(--hover-bg);
+    border-color: var(--input-border);
     color: var(--text-primary);
 }
 
@@ -296,20 +432,37 @@ body {
     background: var(--card-background);
     border-radius: var(--border-radius);
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 8px var(--shadow-color);
+    color: var(--text-primary); /* Assurer que le texte est de la bonne couleur */
 }
 
 .table th {
     font-weight: 600;
     border-top: none;
     padding: calc(var(--spacing-unit) * 0.75);
-    background-color: #f8f9fa;
+    background-color: var(--table-header-bg);
+    color: var(--text-primary);
 }
 
 .table td {
     padding: calc(var(--spacing-unit) * 0.75);
     vertical-align: middle;
-    border-bottom: 1px solid rgba(0,0,0,0.05);
+    border-bottom: 1px solid var(--table-border);
+    color: var(--text-primary);
+    background-color: var(--table-bg); /* Ajout de la couleur d'arrière-plan */
+}
+
+.table tbody tr {
+    background-color: var(--table-bg); /* Assurer que les lignes ont la bonne couleur */
+}
+
+.table tbody tr:hover {
+    background-color: var(--hover-bg); /* Couleur au survol */
+}
+
+/* Pour les petites descriptions dans les tableaux */
+[data-theme="dark"] .table small.text-muted {
+    color: var(--text-muted) !important;
 }
 
 /* Badges */
@@ -322,12 +475,12 @@ body {
 
 /* Search Form */
 .search-form {
-    background: rgba(255,255,255,0.8);
+    background: var(--card-background);
     backdrop-filter: blur(10px);
     border-radius: var(--border-radius);
     padding: calc(var(--spacing-unit) * 1.25);
     margin-bottom: var(--spacing-unit);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 8px var(--shadow-color);
 }
 
 /* Alerts */
@@ -336,7 +489,7 @@ body {
     border: none;
     padding: calc(var(--spacing-unit) * 1.25);
     margin-bottom: var(--spacing-unit);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 8px var(--shadow-color);
 }
 
 /* Pagination */
@@ -351,10 +504,11 @@ body {
     border: none;
     color: var(--text-primary);
     transition: all var(--transition-speed);
+    background-color: var(--card-background);
 }
 
 .pagination .page-link:hover {
-    background-color: rgba(0,0,0,0.05);
+    background-color: var(--hover-bg);
     transform: translateY(-1px);
 }
 
@@ -362,6 +516,294 @@ body {
     background-color: var(--primary-color);
     color: white;
     box-shadow: 0 2px 4px rgba(0,122,255,0.2);
+}
+
+/* Dropdown menus */
+.dropdown-menu {
+    background-color: var(--dropdown-bg);
+    border: 1px solid var(--input-border);
+    box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.dropdown-item {
+    color: var(--text-primary);
+}
+
+.dropdown-item:hover {
+    background-color: var(--hover-bg);
+    color: var(--text-primary);
+}
+
+/* Toast messages */
+.toast {
+    background-color: var(--toast-bg);
+    color: var(--text-primary);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--input-border);
+}
+
+.toast-header {
+    border-bottom: 1px solid var(--input-border);
+}
+
+.toast .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%); /* Inverser la couleur de la croix en mode sombre */
+}
+
+/* Mode sombre - ajustements supplémentaires */
+[data-theme="dark"] .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+[data-theme="dark"] .form-control::placeholder,
+[data-theme="dark"] .form-select::placeholder {
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > * {
+    background-color: rgba(255, 255, 255, 0.05); /* Rayures légères pour les tableaux en mode sombre */
+}
+
+/* Modals en mode sombre */
+.modal-content {
+    background-color: var(--card-background);
+    color: var(--text-primary);
+}
+
+.modal-header, .modal-footer {
+    border-color: var(--table-border);
+}
+
+/* Pour les éléments select en mode sombre */
+[data-theme="dark"] select option {
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+}
+
+/* Pour corriger le problème des textes sur fond sombre */
+[data-theme="dark"] .text-primary {
+    color: #5AC8FA !important;
+}
+
+[data-theme="dark"] .text-muted {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .modal-body .text-muted {
+    color: var(--text-muted) !important;
+}
+
+/* Pour les sous-titres de carte qui utilisent text-primary */
+.card-title.text-primary {
+    color: var(--card-title-color) !important;
+}
+
+/* Assurer que les modaux ont le bon contraste en mode sombre */
+[data-theme="dark"] .modal-content {
+    background-color: var(--card-background);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .modal-header, 
+[data-theme="dark"] .modal-footer {
+    border-color: var(--table-border);
+}
+
+/* Pour s'assurer que les formulaires flottants sont lisibles */
+[data-theme="dark"] .form-floating > .form-control:focus ~ label,
+[data-theme="dark"] .form-floating > .form-control:not(:placeholder-shown) ~ label,
+[data-theme="dark"] .form-floating > .form-select ~ label {
+    color: var(--text-muted);
+}
+
+/* Correction pour les formulaires flottants en mode sombre */
+[data-theme="dark"] .form-floating label {
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .form-floating > .form-control:focus ~ label,
+[data-theme="dark"] .form-floating > .form-control:not(:placeholder-shown) ~ label,
+[data-theme="dark"] .form-floating > .form-select ~ label {
+    color: var(--text-muted);
+    background-color: var(--card-background);
+    padding: 0 0.5rem;
+}
+
+/* Correction pour les étiquettes des champs de formulaire flottants */
+.form-floating > label {
+    position: absolute;
+    top: 50%;
+    left: 0.75rem;
+    transform: translateY(-50%) scale(1);
+    transform-origin: left top;
+    transition: all 0.2s ease-in-out;
+    color: var(--text-secondary);
+    pointer-events: none;
+    background-color: transparent;
+    padding: 0 0.25rem;
+    border: none; /* Supprime toute bordure potentielle */
+    box-shadow: none; /* Supprime les ombres qui pourraient causer un effet de trait */
+}
+
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label,
+.form-floating > .form-select ~ label {
+    top: 0;
+    transform: translateY(-50%) scale(0.85);
+    background-color: var(--card-background);
+    color: var(--text-muted);
+    padding: 0 0.5rem;
+    z-index: 1;
+}
+
+/* Correction pour les champs de formulaire en mode sombre */
+[data-theme="dark"] .form-floating > label {
+    color: var(--text-muted);
+    border: none; /* Assurer qu'il n'y a pas de bordure en mode sombre */
+    box-shadow: none; /* Supprimer les ombres en mode sombre */
+}
+
+[data-theme="dark"] .form-floating > .form-control:focus ~ label,
+[data-theme="dark"] .form-floating > .form-control:not(:placeholder-shown) ~ label,
+[data-theme="dark"] .form-floating > .form-select ~ label {
+    color: var(--text-primary);
+    background-color: var(--card-background);
+}
+
+/* Correction pour le texte de description dans les tableaux */
+[data-theme="dark"] .table td {
+    color: var(--text-primary);
+}
+
+/* S'assurer que toutes les descriptions dans les tableaux sont visibles */
+[data-theme="dark"] .table td span,
+[data-theme="dark"] .table td small {
+    color: var(--text-muted);
+}
+
+/* Correction pour les adresses et autres contenus dans les cartes */
+[data-theme="dark"] .card-text strong,
+[data-theme="dark"] .card-text {
+    color: var(--text-primary);
+}
+
+/* Amélioration du style des tableaux en mode sombre */
+[data-theme="dark"] .table-bordered,
+[data-theme="dark"] .table-bordered td,
+[data-theme="dark"] .table-bordered th {
+    border-color: var(--table-border);
+}
+
+/* Style pour les étiquettes dans les formulaires */
+[data-theme="dark"] .form-label {
+    color: var(--text-muted);
+}
+
+/* Correction pour les tooltips de Bootstrap */
+[data-theme="dark"] .tooltip .tooltip-inner {
+    background-color: var(--card-background);
+    color: var(--text-primary);
+    border: 1px solid var(--table-border);
+}
+
+/* Correction pour les détails d'entrée dans les tableaux */
+[data-theme="dark"] .table tbody td .d-block {
+    color: var(--text-muted);
+}
+
+/* Assurer que tous les sélecteurs sont lisibles en mode sombre */
+[data-theme="dark"] select,
+[data-theme="dark"] option {
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+}
+
+/* Style pour tous les éléments de text-muted */
+[data-theme="dark"] .text-muted {
+    color: var(--text-muted) !important;
+}
+
+/* Style pour les témoins de formulaire */
+[data-theme="dark"] .form-text {
+    color: var(--text-muted);
+}
+
+/* Réglage spécifique pour les filtres de la page d'index */
+[data-theme="dark"] .search-form .form-floating label {
+    color: var(--text-muted);
+}
+
+/* Amélioration du contraste pour les info-bulles */
+[data-theme="dark"] [data-bs-toggle="tooltip"] {
+    color: var(--text-primary);
+}
+
+/* Correction spécifique pour les formulaires flottants */
+.form-floating {
+    position: relative;
+}
+
+.form-floating > .form-control,
+.form-floating > .form-select {
+    height: calc(3.5rem + 2px);
+    padding: 1rem 0.75rem;
+}
+
+.form-floating > label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    padding: 1rem 0.75rem;
+    pointer-events: none;
+    border: 1px solid transparent;
+    transform-origin: 0 0;
+    transition: opacity .1s ease-in-out, transform .1s ease-in-out;
+}
+
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label,
+.form-floating > .form-select ~ label {
+    opacity: .65;
+    transform: scale(.85) translateY(-.5rem) translateX(.15rem);
+    background-color: var(--card-background);
+    padding: 0 0.5rem;
+    height: auto;
+}
+
+[data-theme="dark"] .form-floating label {
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .form-floating > .form-control:focus ~ label,
+[data-theme="dark"] .form-floating > .form-control:not(:placeholder-shown) ~ label,
+[data-theme="dark"] .form-floating > .form-select ~ label {
+    color: var(--text-muted);
+    background-color: var(--card-background);
+}
+
+/* Amélioration pour les sélecteurs en mode sombre */
+[data-theme="dark"] .form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+}
+
+/* Correction pour la visibilité des placeholders */
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+    color: var(--text-muted) !important;
+    opacity: 0.5;
+}
+
+/* Amélioration de la visibilité des étiquettes des filtres */
+[data-theme="dark"] .search-form .form-floating > label {
+    color: var(--text-muted);
+    z-index: 5;
+}
+
+[data-theme="dark"] .search-form .form-floating > .form-control:focus ~ label,
+[data-theme="dark"] .search-form .form-floating > .form-control:not(:placeholder-shown) ~ label,
+[data-theme="dark"] .search-form .form-floating > .form-select ~ label {
+    background-color: var(--search-form-bg);
 }
 
 /* Responsive Design */
@@ -374,13 +816,11 @@ body {
         margin: var(--spacing-unit) 0;
     }
 
-    /* Styles généraux pour les boutons en mobile sauf dans le formulaire d'enregistrement */
     .btn:not(.record-form .btn) {
         width: 100%;
         margin-bottom: 8px;
     }
 
-    /* Styles généraux pour les input groups sauf dans le formulaire d'enregistrement */
     .input-group:not(.record-form .input-group) {
         flex-direction: column;
     }
@@ -390,7 +830,6 @@ body {
         margin-top: 8px;
     }
 
-    /* Styles spécifiques pour le formulaire d'enregistrement en mobile */
     .record-form .d-flex {
         min-width: 0;
     }
@@ -411,7 +850,6 @@ body {
         justify-content: center;
     }
 
-    /* Correction des marges et espacements */
     .record-form .card-body {
         padding: 1rem;
     }
@@ -422,3 +860,5 @@ body {
 
     .record-form .gap-2 {
         gap: 0.5rem !important;
+    }
+}

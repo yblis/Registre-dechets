@@ -3,15 +3,20 @@
 {% block content %}
 <div class="content-header">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="fw-bold" style="background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        <h1 class="fw-bold mobile-hidden-title" style="background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
             Registre des déchets
         </h1>
-        <a href="{{ url_for('main.create_record') }}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Nouvel enregistrement
-        </a>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-primary" id="toggle-filters" type="button">
+                <i class="fas fa-filter"></i> Filtrer
+            </button>
+            <a href="{{ url_for('main.create_record') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Nouvel enregistrement
+            </a>
+        </div>
     </div>
-
-    <div class="search-form card mb-4">
+    
+    <div class="search-form card mb-4 collapse" id="search-form-container">
         <div class="card-body">
             <form method="GET" action="{{ url_for('main.index') }}" class="row g-3">
                 <div class="col-md-3">
@@ -68,7 +73,38 @@
             </form>
         </div>
     </div>
-
+    
+    <!-- Indicateur de filtres actifs -->
+    {% if request.args %}
+    <div class="active-filters mb-3 p-2 rounded bg-light border d-flex justify-content-between align-items-center">
+        <div>
+            <i class="fas fa-info-circle text-primary"></i>
+            <span class="ms-2">Filtres actifs</span>
+            {% if search_form.start_date.data %}
+            <span class="badge bg-primary me-1">Date début: {{ search_form.start_date.data.strftime('%d/%m/%Y') }}</span>
+            {% endif %}
+            {% if search_form.end_date.data %}
+            <span class="badge bg-primary me-1">Date fin: {{ search_form.end_date.data.strftime('%d/%m/%Y') }}</span>
+            {% endif %}
+            {% if search_form.waste_type_id.data %}
+            <span class="badge bg-primary me-1">Type de déchet</span>
+            {% endif %}
+            {% if search_form.producer_id.data %}
+            <span class="badge bg-primary me-1">Producteur</span>
+            {% endif %}
+            {% if search_form.transporter_id.data %}
+            <span class="badge bg-primary me-1">Transporteur</span>
+            {% endif %}
+            {% if search_form.destination.data %}
+            <span class="badge bg-primary me-1">Destination</span>
+            {% endif %}
+        </div>
+        <a href="{{ url_for('main.index') }}" class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-times"></i> Effacer
+        </a>
+    </div>
+    {% endif %}
+    
     <div class="records-container">
         <div class="table-responsive">
             <table class="table table-hover align-middle">
@@ -208,26 +244,29 @@
 .content-header {
     margin-bottom: 2rem;
 }
-
 .search-form {
-    background: rgba(255, 255, 255, 0.8);
+    background: var(--search-form-bg);
     backdrop-filter: blur(10px);
 }
-
+.active-filters {
+    background-color: var(--card-background) !important;
+    border-color: var(--input-border) !important;
+}
+[data-theme="dark"] .active-filters {
+    background-color: var(--card-background) !important;
+    border-color: var(--table-border) !important;
+}
 .table th {
     font-weight: 600;
     border-top: none;
 }
-
 .table td {
     vertical-align: middle;
 }
-
 .badge {
     font-size: 0.85rem;
     padding: 0.4em 0.8em;
 }
-
 .pagination .page-link {
     border-radius: 50%;
     margin: 0 0.25rem;
@@ -237,21 +276,22 @@
     align-items: center;
     justify-content: center;
     border: none;
-    background-color: var(--background-color);
+    background-color: var(--card-background);
     color: var(--text-primary);
 }
-
 .pagination .page-item.active .page-link {
     background-color: var(--primary-color);
     color: white;
 }
-
 .pagination .page-item.disabled .page-link {
     background-color: transparent;
     color: var(--text-secondary);
 }
-
+/* Masquer le titre principal en mode mobile */
 @media (max-width: 768px) {
+    .mobile-hidden-title {
+        display: none;
+    }
     .table-responsive {
         margin: 0 -1rem;
     }
@@ -262,4 +302,23 @@
     }
 }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Gestion du collapse pour le formulaire de filtrage
+    const filterButton = document.getElementById('toggle-filters');
+    const searchFormContainer = document.getElementById('search-form-container');
+    
+    // Si des filtres sont actifs, montrer le formulaire par défaut
+    {% if request.args %}
+    searchFormContainer.classList.add('show');
+    filterButton.classList.add('active');
+    {% endif %}
+    
+    filterButton.addEventListener('click', function() {
+        filterButton.classList.toggle('active');
+        new bootstrap.Collapse(searchFormContainer).toggle();
+    });
+});
+</script>
 {% endblock %}

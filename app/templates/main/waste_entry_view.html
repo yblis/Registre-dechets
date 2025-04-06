@@ -14,7 +14,7 @@
                 <!-- Informations générales -->
                 <div class="col-12">
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h5 class="text-primary mb-0">Informations générales</h5>
+                        <h5 class="card-title text-primary mb-0">Informations générales</h5>
                         <span class="badge bg-secondary">{{ record.date.strftime('%d/%m/%Y') }}</span>
                     </div>
                     <hr>
@@ -27,11 +27,11 @@
                             <h6 class="card-title text-primary">
                                 <i class="fas fa-industry me-2"></i>Producteur
                             </h6>
-                            <p class="card-text">
+                            <div class="card-text">
                                 <strong>{{ record.producer_ref.name }}</strong><br>
-                                <small class="text-muted">SIRET: {{ record.producer_ref.siret }}</small><br>
+                                <span class="text-muted">SIRET: {{ record.producer_ref.siret }}</span><br>
                                 {{ record.producer_ref.address|replace('\n', '<br>')|safe }}
-                            </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -43,12 +43,12 @@
                             <h6 class="card-title text-primary">
                                 <i class="fas fa-truck me-2"></i>Transporteur
                             </h6>
-                            <p class="card-text">
+                            <div class="card-text">
                                 <strong>{{ record.transporter_ref.name }}</strong><br>
-                                <small class="text-muted">SIRET: {{ record.transporter_ref.siret }}</small><br>
-                                <small class="text-muted">N° Immatriculation: {{ record.transporter_ref.registration }}</small><br>
+                                <span class="text-muted">SIRET: {{ record.transporter_ref.siret }}</span><br>
+                                <span class="text-muted">N° Immatriculation: {{ record.transporter_ref.registration }}</span><br>
                                 {{ record.transporter_ref.address|replace('\n', '<br>')|safe }}
-                            </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -60,17 +60,17 @@
                             <h6 class="card-title text-primary">
                                 <i class="fas fa-map-marker-alt me-2"></i>Destination
                             </h6>
-                            <p class="card-text">{{ record.destination }}</p>
+                            <div class="card-text">{{ record.destination }}</div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Déchets -->
                 <div class="col-12">
-                    <h5 class="text-primary mb-3">Détail des déchets</h5>
+                    <h5 class="card-title text-primary mb-3">Détail des déchets</h5>
                     <div class="table-responsive">
                         <table class="table table-bordered">
-                            <thead class="table-light">
+                            <thead>
                                 <tr>
                                     <th>Type de déchet</th>
                                     <th>Code</th>
@@ -91,13 +91,13 @@
                                     <td>{{ entry.waste_type_ref.code }}</td>
                                     <td>{{ entry.quantity }} {{ entry.unit }}</td>
                                     <td>
-                                        <span data-bs-toggle="tooltip" title="{{ entry.treatment_operation_ref.description }}">
+                                        <span class="code-tooltip" data-bs-toggle="tooltip" title="{{ entry.treatment_operation_ref.description }}">
                                             {{ entry.treatment_operation_ref.code }}
                                         </span>
                                     </td>
                                     <td>
                                         {% if entry.elimination_operation_ref %}
-                                        <span data-bs-toggle="tooltip" title="{{ entry.elimination_operation_ref.description }}">
+                                        <span class="code-tooltip" data-bs-toggle="tooltip" title="{{ entry.elimination_operation_ref.description }}">
                                             {{ entry.elimination_operation_ref.code }}
                                         </span>
                                         {% else %}
@@ -119,7 +119,7 @@
                             <h6 class="card-title text-primary">
                                 <i class="fas fa-sticky-note me-2"></i>Notes
                             </h6>
-                            <p class="card-text">{{ record.notes|replace('\n', '<br>')|safe }}</p>
+                            <div class="card-text">{{ record.notes|replace('\n', '<br>')|safe }}</div>
                         </div>
                     </div>
                 </div>
@@ -143,6 +143,11 @@
 }
 .table th {
     font-weight: 600;
+}
+.code-tooltip {
+    cursor: help;
+    text-decoration: underline dotted;
+    text-underline-offset: 2px;
 }
 </style>
 {% endblock %}

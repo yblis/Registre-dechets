@@ -149,17 +149,23 @@
 
                 <!-- Pagination -->
                 {% if logs.pages > 1 %}
+                {% set args = {} %}
+                {% for key, value in request.args.items() %}
+                    {% if key != 'page' %}
+                        {% set _ = args.update({key: value}) %}
+                    {% endif %}
+                {% endfor %}
                 <nav aria-label="Navigation des pages" class="mt-4">
                     <ul class="pagination justify-content-center">
                         <li class="page-item {{ 'disabled' if not logs.has_prev }}">
-                            <a class="page-link" href="{{ url_for('main.activity_logs', page=logs.prev_num, **request.args) if logs.has_prev else '#' }}">
+                            <a class="page-link" href="{{ url_for('main.activity_logs', page=logs.prev_num, **args) if logs.has_prev else '#' }}">
                                 <i class="fas fa-chevron-left"></i>
                             </a>
                         </li>
                         {% for page in logs.iter_pages() %}
                             {% if page %}
                                 <li class="page-item {{ 'active' if page == logs.page }}">
-                                    <a class="page-link" href="{{ url_for('main.activity_logs', page=page, **request.args) }}">{{ page }}</a>
+                                    <a class="page-link" href="{{ url_for('main.activity_logs', page=page, **args) }}">{{ page }}</a>
                                 </li>
                             {% else %}
                                 <li class="page-item disabled">
@@ -168,7 +174,7 @@
                             {% endif %}
                         {% endfor %}
                         <li class="page-item {{ 'disabled' if not logs.has_next }}">
-                            <a class="page-link" href="{{ url_for('main.activity_logs', page=logs.next_num, **request.args) if logs.has_next else '#' }}">
+                            <a class="page-link" href="{{ url_for('main.activity_logs', page=logs.next_num, **args) if logs.has_next else '#' }}">
                                 <i class="fas fa-chevron-right"></i>
                             </a>
                         </li>
