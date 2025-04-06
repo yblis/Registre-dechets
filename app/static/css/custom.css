@@ -806,6 +806,73 @@ h1, h2, h3, h4, h5, h6 {
     background-color: var(--search-form-bg);
 }
 
+/* Styles pour les entrées de types de déchets */
+.waste-entry {
+    transition: all 0.3s ease;
+    position: relative;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.waste-entry:hover {
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.waste-entry-header {
+    position: relative;
+}
+
+.waste-entry-header h5 {
+    display: flex;
+    align-items: center;
+}
+
+.waste-entry-header h5::before {
+    content: "";
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+/* Alternance de couleurs légères pour les entrées de déchets */
+.waste-entry:nth-child(even) {
+    background-color: rgba(0, 122, 255, 0.05) !important;
+}
+
+.waste-entry:nth-child(odd) {
+    background-color: rgba(88, 86, 214, 0.05) !important;
+}
+
+/* Mode sombre pour les entrées de déchets */
+[data-theme="dark"] .waste-entry {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+
+[data-theme="dark"] .waste-entry:nth-child(even) {
+    background-color: rgba(90, 200, 250, 0.08) !important;
+}
+
+[data-theme="dark"] .waste-entry:nth-child(odd) {
+    background-color: rgba(88, 86, 214, 0.08) !important;
+}
+
+[data-theme="dark"] .waste-entry-header h5::before {
+    background-color: var(--card-title-color);
+}
+
+/* Animation pour les nouvelles entrées de déchets */
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(0, 122, 255, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0); }
+}
+
+.waste-entry.new-entry {
+    animation: pulse 1.5s;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .container {
